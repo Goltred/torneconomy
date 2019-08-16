@@ -175,7 +175,7 @@ function createStockRow(tBody, name, stock, addingStock) {
   actionsField.appendChild(deleteButton);
   row.appendChild(actionsField);
 
-  tBody.appendChild(row);
+  $(tBody).prepend(row);
 
   return { 
     stockName: name,
