@@ -1,14 +1,26 @@
 const settings = {
-  saveKey(elID, keepField) {
-    var keyField = document.getElementById(elID);
-    if (keyField) {
-      chrome.storage.local.set({ tornkey: keyField.value });
-      let savedChangesEvent = new Event('savedChanges');
-      document.dispatchEvent(savedChangesEvent);
+  checkInterval: 60000,
+  notificationInterval: 30000,
+  apikey: undefined,
+  buyCol: 2,
+  sellCol: 3,
+  nameCol: 0,
 
-      if (!keepField) {
-        settings.removeApiField(keyField.value);
-      }
+  saveKey(key) {
+    settings.apikey = key;
+    chrome.storage.local.set({ tornkey: key }, function() {
+      chrome.runtime.sendMessage({ msg: 'apiKeySaved' });
+    });
+  },
+
+  saveIntervals(check, notification) {
+    if (check && notification) {
+      settings.checkInterval = check;
+      settings.notificationInterval = notification;
+      chrome.storage.local.set({ 
+        checkInterval: check,
+        notificationInterval: notification
+      });
     }
   },
 
@@ -18,27 +30,37 @@ const settings = {
     settings.apikey = key;
   },
 
-  validateSettings(keepApiField) {
-    // Load key from storage
-    chrome.storage.local.get('tornkey', function(data) {
-      if (data.tornkey && !keepApiField) {
-        settings.removeApiField(data.tornkey);
-      } else {
-        let keyField = document.getElementById('apikey');
-        keyField.setAttribute('value', data.tornkey ? data.tornkey : '');
-        
-        document.getElementById('btnSave').addEventListener('click', function(event) {
-          settings.saveKey('apikey', keepApiField);
-        });
-      }
-    });
+  validateSettings(keepApiField, message) {
+    // Load keys from storage
+    chrome.storage.local.get([
+      'tornkey', 
+      'settings', 
+      'checkInterval', 
+      'notificationInterval'
+    ], function(data) {
+      let keyLoaded = false;
+      if (data.tornkey) {
+        settings.apikey = data.tornkey;
+        keyLoaded = true;
 
-    // Get the field numbers
-    chrome.storage.local.get('settings', function(data) {
+        var msg = new Event('apiKeyLoaded');
+        document.dispatchEvent(msg);
+      }
+
       if (data.settings) {
         settings.buyCol = data.settings.buyCol;
         settings.sellCol = data.settings.sellCol;
         settings.nameCol = data.settings.nameCol;
+      }
+
+      if (data.checkInterval) {
+        settings.checkInterval = data.checkInterval;
+        settings.notificationInterval = data.notificationInterval;
+      }
+
+      if (keyLoaded) {
+        var msg = new Event(message);
+        document.dispatchEvent(msg);
       }
     })
   }

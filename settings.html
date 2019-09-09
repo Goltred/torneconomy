@@ -1,18 +1,60 @@
 <html>
     <head>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/all.css">
     </head>
     <body>
         <div class="container-fluid">
-            <h2>TCH - Stocks Options</h2>
-            <div class="row" id="apisettings">
-                <div class="input-group mb-3">
-                    <label for="apikey">Torn API Key</label>
-                    <input type="password" class="form-control" id="apikey" placeholder="Torn API Key">
-                    <button class="btn btn-outline-secondary" type="button" id="btnSave">Save</button>
+            <h2>Torn City Helper - Options</h2>
+            <form>
+                <div class="form-group row" id="apisettings">
+                    <label for="apikey"class="col-sm-2 col-form-label">Torn API Key</label>
+                    <div class="col-sm-6">
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="apikey" placeholder="Torn API Key">
+                            <button class="btn btn-outline-primary" type="button" id="btnSaveApiKey"><i class="fas fa-save"></i></button>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </form>
+            <form>
+                <div class="form-group row pl-2">
+                    <h4>Time Intervals</h4>
+                </div>
+                <div class="form-group row">
+                    <label for='checkInterval' class='col-sm-2 col-form-label'>Stock Check Interval</label>
+                    <div class="col-sm-6">
+                        <select class="custom-select" id="checkIntervalSelect">
+                            <option value="1">1 Minute</option>
+                            <option value="5">5 Minutes</option>
+                            <option value="15">15 Minutes</option>
+                            <option value="30">30 Minutes</option>
+                            <option value="60">60 Minutes</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                        <label for='notificationInterval' class='col-sm-2 col-form-label'>Notification Interval</label>
+                        <div class="col-sm-6">
+                            <select class="custom-select" id="notificationIntervalSelect">
+                                <option value="1">1 Minute</option>
+                                <option value="5">5 Minutes</option>
+                                <option value="15">15 Minutes</option>
+                                <option value="30">30 Minutes</option>
+                                <option value="60">60 Minutes</option>
+                            </select>
+                        </div>
+                    </div>
+                <div class="form-group row">
+                    <div class="col-sm-8">
+                        <button type="button" class="btn btn-primary" id="btnSaveSettings">Save</button>
+                    </div>
+                </div>
+            </form>
         </div>
+        <script src="js/jquery-3.4.1.min.js"></script>
+        <script src="js/popper.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
         <script src='settings.js'></script>
         <script src='options.js'></script>
     </body>

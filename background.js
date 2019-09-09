@@ -9,3 +9,7 @@ chrome.runtime.onInstalled.addListener(function() {
     }
   });
 });
+
+if (settings) {
+  settings.validateSettings(undefined, 'settingsLoaded');
+}

@@ -1,15 +1,14 @@
 {
     "name": "Torn City Helper - Stocks",
-    "version": "1.0",
+    "version": "1.0.1",
     "description": "Receive notifications on your preferences for stocks in Torn City",
     "manifest_version": 2,
     "background": {
-        "scripts": ["background.js", "torn.js"],
-        "persistent": false
+        "scripts": ["./js/jquery-3.4.1.min.js", "settings.js", "torn.js", "background.js"],
+        "persistent": true
     },
     "permissions": ["activeTab", "storage", "notifications"],
     "browser_action": {
         "default_popup": "market.html"
-    },
-    "content_security_policy": "script-src 'self' https://kit.fontawesome.com; object-src 'self'"
+    }
 }

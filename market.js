@@ -1,3 +1,16 @@
+function loadTornStocks() {
+  chrome.storage.local.get('tornStocks', (data) => {
+    if (data.tornStocks) {
+      for(const k in data.tornStocks) {
+        const { acronym } = data.tornStocks[k];
+        tornStocks[acronym] = data.tornStocks[k];
+      }
+
+      var msg = new Event('popupLoadedTornStocks');
+      document.dispatchEvent(msg);
+    }
+  })
+}
 function loadStocks() {
   let stocksTable = document.getElementById('stocks');
   let tBody = stocksTable.querySelector('tbody');
@@ -40,8 +53,7 @@ function saveAllStocks() {
   // Save the new object
   chrome.storage.local.set({ stocks });
 
-  const savedChangesEvent = new Event('savedChanges');
-  document.dispatchEvent(savedChangesEvent);
+  chrome.runtime.sendMessage({ msg: 'popupSavedStocks' });
 }
 
 function rowSaveClick(e) {
@@ -158,21 +170,29 @@ function createStockRow(tBody, name, stock, addingStock) {
 
   // Add action buttons
   let actionsField = document.createElement('td');
+  let actionsDiv = document.createElement('div');
+  actionsDiv.classList = 'row d-flex align-items-center';
+
   let saveButton = document.createElement('button');
   saveButton.classList = 'btn btn-sm btn-outline-primary';
   saveButton.setAttribute('type', 'button');
   saveButton.setAttribute('id', 'btnSave-' + name);
-  saveButton.innerText = 'Save';
+  let saveIcon = document.createElement('i');
+  saveIcon.classList = 'fa fa-save';
+  saveButton.appendChild(saveIcon);
   saveButton.addEventListener("click", rowSaveClick);
-  actionsField.appendChild(saveButton);
+  actionsDiv.appendChild(saveButton);
 
   let deleteButton = document.createElement('button');
   deleteButton.classList = 'btn btn-sm btn-outline-danger';
   deleteButton.setAttribute('type', 'button');
   deleteButton.setAttribute('id', 'btnDelete-' + name);
-  deleteButton.innerText = 'Delete';
+  let deleteIcon = document.createElement('i');
+  deleteIcon.classList = 'fas fa-minus-circle';
+  deleteButton.appendChild(deleteIcon);
   deleteButton.addEventListener('click', rowDeleteClick);
-  actionsField.appendChild(deleteButton);
+  actionsDiv.appendChild(deleteButton);
+  actionsField.appendChild(actionsDiv);
   row.appendChild(actionsField);
 
   $(tBody).prepend(row);
@@ -205,28 +225,47 @@ function showErrorModal(errorTitle, error) {
   $("#errorModal").modal('show');
 }
 
-// Validate our settings
-settings.validateSettings();
+document.addEventListener('apiKeyLoaded', () => {
+  $('#apisettings').remove();
+});
 
-// Start getting torn stock information and load the table
-//getTornStockInfo();
-document.addEventListener('stocksLoaded', function() {
+document.addEventListener('apiKeySaved', () => {
+  $('#apisettings').remove();
+});
+
+document.addEventListener('popupSettingsLoaded', () => {
+  loadTornStocks();
+});
+
+document.addEventListener('popupLoadedTornStocks', () => {
   loadStocks();
   checkLimits();
 });
 
-document.addEventListener('savedChanges', function() {
-  getTornStockInfo();
-  loadStocks();
-  checkLimits();
-})
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log('got message');
+  console.log(request);
+
+  if (request.msg === 'stocksLoaded') {
+    loadTornStocks();
+  }
+
+  sendResponse();
+});
 
 // Attach the addNew function to the button
-document.getElementById('btnAdd').addEventListener('click', function() {
+$('#btnAdd').on('click', function() {
   addNew();
 });
 
 // Attach the saveAll function to its button
-document.getElementById('btnSaveStocks').addEventListener('click', function() {
+$('#btnSaveStocks').on('click', function() {
   saveAllStocks();
 });
+
+$('#btnSaveApiKey').on('click', () => {
+  settings.saveKey($('#apikey').val(), true);
+});
+
+// Validate our settings
+settings.validateSettings(undefined, 'popupSettingsLoaded');

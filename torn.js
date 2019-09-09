@@ -1,35 +1,40 @@
 let tornStocks = {};
-function getTornStockInfo() {
-  chrome.storage.local.get('tornkey', function(data) {
-    if (data.tornkey) {
-      let xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function() {
-        if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-          let response = JSON.parse(this.responseText);
-
-          if (response.error) {
-            showErrorModal('Torn API Error: ' + response.error.code, response.error.error);
-            return;
-          }
-
-          for(const k in response.stocks) {
-            const { acronym } = response.stocks[k];
-            tornStocks[acronym] = response.stocks[k];
-          }
-
-          let stocksLoadedEvent = new Event('stocksLoaded');
-          document.dispatchEvent(stocksLoadedEvent);
-        }
-      }
-
-      xhttp.open('GET', 'https://api.torn.com/torn/?selections=stocks&key=' + data.tornkey);
-      xhttp.send();
-    }
-  });
-}
-
 let refreshInterval = 60000;
 let notificationInterval = 300000;
+
+function getTornStockInfo() {
+  if (settings.apikey) {
+    queryTornStocksApi('https://api.torn.com/torn/?selections=stocks&key=' + settings.apikey);
+  } else {
+    chrome.storage.local.get('tornkey', function(data) {
+      if (data.tornkey) {
+        queryTornStocksApi('https://api.torn.com/torn/?selections=stocks&key=' + data.tornkey);
+      }
+    });
+  }
+}
+
+function saveTornStocks(stocks) {
+  for(const k in stocks) {
+    const { acronym } = stocks[k];
+    tornStocks[acronym] = stocks[k];
+  }
+
+  chrome.storage.local.set({ tornStocks });
+}
+
+function queryTornStocksApi(url) {
+  $.get(url, (response) => {
+    if (response.error) {
+      console.error('Torn API Error: ' + response.error.code + ' ' + response.error.error)
+      return;
+    }
+
+    saveTornStocks(response.stocks);
+
+    chrome.runtime.sendMessage({ msg: 'stocksLoaded' });
+  });
+}
 
 function checkLimits() {
   chrome.storage.local.get('stocks', function(data) {
@@ -56,30 +61,22 @@ function checkLimits() {
       if (buy.length === 0 && sell.length > 0) {
         title = `Time to sell: ${sell.join(', ')}`;
         message = `You should go and sell the following stocks:\n${sell.join('\n')}`;
-        chrome.browserAction.setBadgeText({
-          text: 'Sell'
-        });
+        setBadge('Sell');
       } else if (sell.length === 0 && buy.length > 0) {
         title = `Time to buy: ${buy.join(', ')}`;
         message = `You should go and buy the following stocks:\n${buy.join('\n')}`;
-        chrome.browserAction.setBadgeText({
-          text: 'Buy'
-        });
+        setBadge('Buy');
       } else if (sell.length > 0 && buy.length > 0) {
         title = 'You have stocks to buy and sell!';
         message = `You have stocks to sell (${sell.join(', ')}) and stocks to buy (${buy.join(', ')})`;
-        chrome.browserAction.setBadgeText({
-          text: 'See'
-        });
+        setBadge('See');
       }
 
       if (title && message) {
-        chrome.storage.sync.get('lastNotification', function(data) {
+        chrome.storage.local.get('lastNotification', function(data) {
           if (data.lastNotification && Date.now() >= data.lastNotification + notificationInterval || !data.lastNotification) {
             // Send notification
             sendNotification(title, message, 'images/icon16.png');
-          } else {
-            let delta = (data.lastNotification + notificationInterval) - Date.now();
           }
         });
 
@@ -102,21 +99,48 @@ function sendNotification(title, message, iconUrl) {
     iconUrl,
   });
 
-  chrome.storage.sync.set({ lastNotification: Date.now() });
+  chrome.storage.local.set({ lastNotification: Date.now() });
 }
 
-// Main script execution
-getTornStockInfo();
-checkLimits();
+function setBadge(text) {
+  chrome.browserAction.setBadgeText({
+    text
+  });
+}
 
-chrome.storage.local.get('settings', function(data) {
-  if (data.settings) {
-    refreshInterval = data.settings.refreshInterval;
-    notificationInterval = data.settings.notificationInterval;
-  }
-
+function setBackgroundProcess() {
+  console.log('SetInterval called with refresh interval ' + refreshInterval);
   setInterval(function() {
+    console.log('Running interval function');
     getTornStockInfo();
     checkLimits();
   }, refreshInterval);
+}
+
+document.addEventListener('settingsLoaded', () => {
+  getTornStockInfo();
+  setBackgroundProcess();
+})
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log('torn.js message handler');
+  console.log(request);
+  if (request.msg === 'popupSavedStocks') {
+    getTornStockInfo();
+
+    sendResponse();
+  } else if (request.msg === 'settingsSaved') {
+    notificationInterval = request.notificationInterval;
+    refreshInterval = request.checkInterval;
+
+    clearInterval();
+    settings.validateSettings(undefined, 'apiKeySaved');
+    setBackgroundProcess();
+
+    sendResponse('thanks');
+  } else if (request.msg === 'stocksLoaded') {
+    checkLimits();
+
+    sendResponse();
+  }
 });
