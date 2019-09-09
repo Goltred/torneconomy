@@ -16,6 +16,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Communication between background script and popup to make querying a bit smarter
 
-## [1.0.0] - 2017-06-20
+## [1.0.0] - 2019-08-15
 ### Added
 - Create first iteration of the application.
