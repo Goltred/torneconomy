@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2019-09-09
+- Added check to send buy notification only if available stocks > 0
+
 ## [1.0.1] - 2019-09-09
 ### Added
 - Options page and icon in main popup

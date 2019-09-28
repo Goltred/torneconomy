@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/all.css">
+  </head>
+  <body>
+      <div class="container">
+        <ul class="nav nav-tabs" id="mainTab" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="stocks-tab" data-toggle="tab" href="#stocks" role="tab" aria-controls="stocks" aria-selected="false">Stocks</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="faction-monitor-tab" data-toggle="tab" href="#faction-monitor" role="tab" aria-controls="faction-monitor" aria-selected="false">Faction</a>
+          </li>
+        </ul>
+        <div class="tab-content" id="popupContent">
+          <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">Home</div>
+          <div class="tab-pane fade" id="stocks" role="tabpanel" aria-labelledby="stocks-tab">
+              <div class="row">
+                  <div class="col-10 text-center">
+                      <h3>Torn City Helper - Stocks</h3>
+                  </div>
+                  <div class="col-2">
+                      <span class="float-right"><a href="settings.html" target="_blank"><i class="fas fa-cog text-secondary"></i></a></span>
+                  </div>
+                  </div>
+                  <div class="row" id="apisettings">
+                  <div class="input-group mb-3">
+                      <label for="apikey">Torn API Key</label>
+                      <input type="password" class="form-control" id="apikey" placeholder="Torn API Key">
+                      <button class="btn btn-outline-secondary" type="button" id="btnSaveApiKey">Save</button>
+                  </div>
+              </div>
+              
+              <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                      <h5 class="modal-title" id="modalLabel"></h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                      </div>
+                      <div class="modal-body">
+                      </div>
+                  </div>
+                  </div>
+              </div>
+              
+              <div class="row">
+                  <h4>Watched Stocks</h4>
+                  <button class="btn btn-sm btn-primary" type="button" id="btnAdd">Add</button>
+              </div>
+              
+              <div class="row">
+                  <table class="table table-striped" id="stocks">
+                  <thead class="thead-dark">
+                      <tr>
+                      <th scope="col">Name</th>
+                      <th scope="col">Current Price</th>
+                      <th scope="col">Desired Buy Price</th>
+                      <th scope="col">Desired Sell Price</th>
+                      <th scope="col">Available</th>
+                      <th scope="col">Actions</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                  <tfoot>
+                      <tr>
+                      <td colspan="6"><button class="btn btn-secondary" type="button" id="btnSaveStocks">Update All</button></td>
+                      </tr>
+                  </tfoot>
+                  </table>
+              </div>
+          </div>
+          <div class="tab-pane fade" id="faction-monitor" role="tabpanel" aria-labelledby="faction-monitor-tab">
+            <div class="row">
+              <h4>Faction Revive</h4>
+            </div>
+            <div class="row">
+              <label for="faction-id">Faction ID</label><input type="number" id="factionWatchId" />
+              <button class="btn btn-sm btn-primary" type="button" id="factionWatchAdd">Add</button>
+            </div>
+            <div id="faction-info"></div>
+          </div>
+        </div>
+      </div>
+      <script src="js/jquery-3.4.1.min.js"></script>
+      <script src="js/popper.min.js"></script>
+      <script src="js/bootstrap.js"></script>
+      <script src="settings.js"></script>
+      <script src="stocks.js"></script>
+      <script src="faction-revive.js"></script>
+  </body>
+
+</html>

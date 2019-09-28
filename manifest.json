@@ -1,14 +1,14 @@
 {
-    "name": "Torn City Helper - Stocks",
-    "version": "1.0.1",
-    "description": "Receive notifications on your preferences for stocks in Torn City",
+    "name": "Torn City Helper",
+    "version": "1.0.2",
+    "description": "Group of helping mechanism for different things in Torn (www.torn.com):\nCurrently Included:\n  - Stocks Monitoring\n  - Personal Revive Contracts",
     "manifest_version": 2,
     "background": {
-        "scripts": ["./js/jquery-3.4.1.min.js", "settings.js", "torn.js", "background.js"],
+        "scripts": ["./js/jquery-3.4.1.min.js", "settings.js", "notifications.js", "tornBackend.js", "tornStocks.js", "tornRevive.js", "background.js"],
         "persistent": true
     },
     "permissions": ["activeTab", "storage", "notifications"],
     "browser_action": {
-        "default_popup": "market.html"
+        "default_popup": "popup.html"
     }
 }

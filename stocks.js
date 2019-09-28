@@ -1,3 +1,5 @@
+let tornStocks = {};
+
 function loadTornStocks() {
   chrome.storage.local.get('tornStocks', (data) => {
     if (data.tornStocks) {
@@ -11,6 +13,7 @@ function loadTornStocks() {
     }
   })
 }
+
 function loadStocks() {
   let stocksTable = document.getElementById('stocks');
   let tBody = stocksTable.querySelector('tbody');
@@ -239,7 +242,6 @@ document.addEventListener('popupSettingsLoaded', () => {
 
 document.addEventListener('popupLoadedTornStocks', () => {
   loadStocks();
-  checkLimits();
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
